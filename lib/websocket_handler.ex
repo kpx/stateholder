@@ -21,6 +21,10 @@ defmodule StateHolder.WebsocketHandler do
 	  	{:ok, req, state}
 	  end
 
+	  def websocket_terminate(_data, req, state) do
+	  	{:ok, req, state}
+	  end
+
 	  def broadcast(pids, msg) do
 	    Enum.each(pids, fn(pid) -> send(pid, msg) end)
 	  end

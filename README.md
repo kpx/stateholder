@@ -32,21 +32,23 @@ Install deps and run:
 
   - Create an echo server that use StateHolder.WebsocketHandler
   - implement websocket_handle({:text, websocket_text}, req, state) :: {:reply, {:text, reply_message}, req, state}
-
-  defmodule EchoServer.Websocket do
-    def websocket_handle({:text, text}, req, state) do
-      {:reply, {:text, text}, req, state}
-    end
-  end
-
-  - Create your app and start StateHolder
-  defmodule EchoServer do
-    use Application
   
-    def start(_type, _args) do
-      StateHolder.start_state_holder("/", EchoServer.Websocket)
-      # (Start some supervisor here if you want)
-    end
-  end
-
+	``` elixir	  
+	defmodule EchoServer.Websocket do
+	  def websocket_handle({:text, text}, req, state) do
+	    {:reply, {:text, text}, req, state}
+	  end
+	end
+	```
+  - Create your app and start StateHolder
+	``` elixir  
+	defmodule EchoServer do
+	  use Application
+	  
+	  def start(_type, _args) do
+	    StateHolder.start_state_holder("/", EchoServer.Websocket)
+	    # (Start some supervisor here if you want)
+	  end
+	end
+	```
   - Use your favourite websocket client or whatever to connect

@@ -15,7 +15,7 @@ defmodule StateHolder.Room do
 	def create_room(room_name, creator, creator_pid) when is_atom(room_name) do	
 		case exists?(room_name) do
 			false -> 
-				Crossworld.Supervisor.new_room(room_name)
+				StateHolder.Supervisor.new_room(room_name)
 				#Autojoin member that creates a room
 				add_member(room_name, creator, creator_pid)
 				:ok
@@ -60,6 +60,17 @@ defmodule StateHolder.Room do
 	end
 	def get_room_info(room_name) when is_atom(room_name) do
 		Agent.get(room_name, fn x -> x end, @agent_timeout)		
+	end
+
+	def broadcast(room_name, msg) when is_binary(room_name) do
+		atom_name = String.to_existing_atom(room_name)
+		broadcast(atom_name, msg)
+	end
+	def broadcast(room_name, msg) when is_atom(room_name) do
+		members = StateHolder.Room.get_members(room_name)
+		broadcast_msg = {:broadcast, msg}
+		pids = Enum.map(members, fn({_, pid}) -> pid end)
+    	StateHolder.Websocket.broadcast(pids, broadcast_msg)
 	end
 
 	defp exists?(atom_name) do

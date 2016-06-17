@@ -70,7 +70,7 @@ defmodule StateHolder.Room do
 		members = StateHolder.Room.get_members(room_name)
 		broadcast_msg = {:broadcast, msg}
 		pids = Enum.map(members, fn({_, pid}) -> pid end)
-    	StateHolder.Websocket.broadcast(pids, broadcast_msg)
+    	StateHolder.WebsocketHandler.broadcast(pids, broadcast_msg)
 	end
 
 	defp exists?(atom_name) do

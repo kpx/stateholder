@@ -8,9 +8,12 @@ defmodule StateHolder.WebsocketHandler do
     {:ok, req, opts}
   end
 
-  def websocket_handle(data, req, state) do
+  def websocket_handle({:text, text}, req, state) do
   	callback = state[:websocket_callback]
-	Kernel.apply(callback, [data, req, state])
+	case Kernel.apply(callback, [text]) do
+		:no_reply -> {:ok, req, state}
+		{:reply, reply_msg} -> {:reply, {:text, reply_msg}, req, state}
+	end
   end
 
   def websocket_info({:broadcast, broadcast_msg }, req, state) do

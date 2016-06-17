@@ -30,13 +30,12 @@ Install deps and run:
 
 ### Super simple echo websocket server
 
-  - Create an echo server that use StateHolder.WebsocketHandler
-  - implement websocket_handle({:text, websocket_text}, req, state) :: {:reply, {:text, reply_message}, req, state}
+  - Create an echo server and implement a websocket callback websocket_callback(String.t) :: {:reply, String.t} | :no_reply
   
 	``` elixir	  
 	defmodule EchoServer.Websocket do
-	  def websocket_handle({:text, text}, req, state) do
-	    {:reply, {:text, text}, req, state}
+	  def websocket_callback(websocket_msg) do
+	    {:reply, websocket_msg}
 	  end
 	end
 	```
@@ -46,7 +45,7 @@ Install deps and run:
 	  use Application
 	  
 	  def start(_type, _args) do
-	    StateHolder.start_state_holder("/", EchoServer.Websocket)
+	    StateHolder.start_state_holder([{:websocket, "/", &EchoServer.Websocket.websocket_callback/1}])
 	    # (Start some supervisor here if you want)
 	  end
 	end

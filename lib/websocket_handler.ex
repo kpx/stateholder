@@ -4,8 +4,8 @@ defmodule StateHolder.WebsocketHandler do
   	{:upgrade, :protocol, :cowboy_websocket}
   end
 
-  def websocket_init(_type, req, _opts) do
-    {:ok, req, :undefined_state}
+  def websocket_init(_type, req, opts) do
+    {:ok, req, opts}
   end
 
   def websocket_handle(data, req, state) do

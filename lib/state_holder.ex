@@ -5,9 +5,17 @@ defmodule StateHolder do
     StateHolder.Supervisor.start_link()
   end
 
-  def start_state_holder(websocket_path, websocket_callback) do
+  def start_state_holder(opts) do
+    route_config = Enum.map(opts, 
+      fn {:websocket, route, callback} ->
+            {route, StateHolder.WebsocketHandler, [{:websocket_callback, callback}]}
+         {:static, route, path} ->
+            {route, :cowboy_static, {:file, path}}
+      end)
+    #[{:websocket, route, callback}, {:static, route, path}]
+    #{"/", cowboy_static, {priv_file, my_app, "static/index.html"}}
     dispatch = :cowboy_router.compile([
-                {:_, [{websocket_path, StateHolder.WebsocketHandler, [{:websocket_callback, websocket_callback}]}]}
+                {:_, route_config}
                ])
     {:ok, _} = :cowboy.start_http(:http, 100,
                                   [port: 8080],

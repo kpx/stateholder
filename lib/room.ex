@@ -40,6 +40,10 @@ defmodule StateHolder.Room do
 	@doc """
 	Returns all members for a room
 	"""
+	def get_members(room_name) when is_binary(room_name) do
+		atom_name = String.to_existing_atom(room_name)
+		get_members(atom_name)
+	end
 	def get_members(room_name) when is_atom(room_name) do
 		room_info = get_room_info(room_name)
 		members = Map.get(room_info, :members, MapSet.new())

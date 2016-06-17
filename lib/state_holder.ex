@@ -13,6 +13,8 @@ defmodule StateHolder do
             {route, :cowboy_static, {:file, path}}
          {:static_priv, app, route, path} ->
             {route, :cowboy_static, {:priv_file, app, path}}
+         {:static_priv_dir, app, route, path} ->
+            {route, :cowboy_static, {:priv_dir, app, path}}
       end)
     #[{:websocket, route, callback}, {:static, route, path}]
     #{"/", cowboy_static, {priv_file, my_app, "static/index.html"}}

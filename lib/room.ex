@@ -45,7 +45,7 @@ defmodule StateHolder.Room do
 		get_members(atom_name)
 	end
 	def get_members(room_name) when is_atom(room_name) do
-		room_info = get_room_info(room_name)
+		room_info = get_room(room_name)
 		members = Map.get(room_info, :members, MapSet.new())
 		MapSet.to_list(members)
 	end
@@ -58,12 +58,16 @@ defmodule StateHolder.Room do
     	Agent.update(room_name, &Map.put(&1, key, data))
   	end
 
+  	defp get_room(room_name) do
+  		Agent.get(room_name, fn x -> x end, @agent_timeout)
+  	end
+
 	def get_room_info(room_name) when is_binary(room_name) do
 		atom_name = String.to_existing_atom(room_name)
 		get_room_info(atom_name)
 	end
 	def get_room_info(room_name) when is_atom(room_name) do
-		Agent.get(room_name, fn x -> x end, @agent_timeout)		
+		Map.drop(get_room(room_name), [:members])		
 	end
 
 	def broadcast(room_name, msg) when is_binary(room_name) do
@@ -77,8 +81,11 @@ defmodule StateHolder.Room do
     	StateHolder.WebsocketHandler.broadcast(pids, broadcast_msg)
 	end
 
-	defp exists?(atom_name) do
-		Process.whereis(atom_name) != nil
+	def exists?(room_name) when is_binary(room_name) do
+		exists?(String.to_atom(room_name))
+	end
+	def exists?(room_name) when is_atom(room_name) do
+		Process.whereis(room_name) != nil
 	end
 
 

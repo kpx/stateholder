@@ -1,3 +1,5 @@
 _build/
 deps/
 mix.lock
+examples/chatroom/deps/
+examples/chatroom/_build/

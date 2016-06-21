@@ -1,6 +1,9 @@
 defmodule StateHolder.Room do
-	@agent_timeout 5000
+	@moduledoc """
+	Module handeling all functions for a room (key-value storage with connected users)
+	"""
 
+	@agent_timeout 5000
   
 	@doc """
 	Creates a room with the given 'name' and adds the creating player
@@ -50,6 +53,9 @@ defmodule StateHolder.Room do
 		MapSet.to_list(members)
 	end
 
+	@doc """
+	Updates data stored with key in room with name `room_name`	
+	"""
 	def update_room(room_name, key, data) when is_binary(room_name) do
 		atom_name = String.to_existing_atom(room_name)
 		update_room(atom_name, key, data)
@@ -57,11 +63,10 @@ defmodule StateHolder.Room do
 	def update_room(room_name, key, data) when is_atom(room_name) do
     	Agent.update(room_name, &Map.put(&1, key, data))
   	end
-
-  	defp get_room(room_name) do
-  		Agent.get(room_name, fn x -> x end, @agent_timeout)
-  	end
-
+ 
+ 	@doc """
+ 	Returns all stored data in room except room member data
+ 	""" 	
 	def get_room_info(room_name) when is_binary(room_name) do
 		atom_name = String.to_existing_atom(room_name)
 		get_room_info(atom_name)
@@ -70,17 +75,24 @@ defmodule StateHolder.Room do
 		Map.drop(get_room(room_name), [:members])		
 	end
 
+	@doc """
+	Broadcasts a message `msg` to all members of the room 
+	"""
 	def broadcast(room_name, msg) when is_binary(room_name) do
 		atom_name = String.to_existing_atom(room_name)
 		broadcast(atom_name, msg)
 	end
 	def broadcast(room_name, msg) when is_atom(room_name) do
 		members = StateHolder.Room.get_members(room_name)
+		#Tag the message as a broadcast (used by websocket handler)
 		broadcast_msg = {:broadcast, msg}
 		pids = Enum.map(members, fn({_, pid}) -> pid end)
     	StateHolder.WebsocketHandler.broadcast(pids, broadcast_msg)
 	end
 
+	@doc """
+	Checks if a room with name `room_name` exists
+	"""
 	def exists?(room_name) when is_binary(room_name) do
 		exists?(String.to_atom(room_name))
 	end
@@ -88,5 +100,8 @@ defmodule StateHolder.Room do
 		Process.whereis(room_name) != nil
 	end
 
+	defp get_room(room_name) do
+  		Agent.get(room_name, fn x -> x end, @agent_timeout)
+  	end
 
 end

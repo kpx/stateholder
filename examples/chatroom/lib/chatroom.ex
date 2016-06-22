@@ -7,7 +7,7 @@ defmodule ChatRoom do
   	end
 
 	def start(_type, _args) do
-		StateHolder.start_state_holder([{:websocket, "/", &websocket_callback/1}])
+		StateHolder.start_state_holder([{:websocket, "/", &websocket_callback/1}, {:port, 8080}])
 	end
 
 	def websocket_callback(msg) do

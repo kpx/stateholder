@@ -5,18 +5,21 @@ defmodule StateHolder do
     StateHolder.Supervisor.start_link()
   end
 
-  def start_state_holder(route_opts, port) do
-    route_config = Enum.map(route_opts, 
-      fn {:websocket, route, callback} ->
-            {route, StateHolder.WebsocketHandler, [{:websocket_callback, callback}]}
-         {:static, route, path} ->
-            {route, :cowboy_static, {:file, path}}
-         {:static_priv, app, route, path} ->
-            {route, :cowboy_static, {:priv_file, app, path}}
-         {:static_priv_dir, app, route, path} ->
-            {route, :cowboy_static, {:priv_dir, app, path}}
+  def start_state_holder(opts) do
+    route_config = List.foldl(opts, [], 
+      fn {:websocket, route, callback}, acc ->
+            [{route, StateHolder.WebsocketHandler, [{:websocket_callback, callback}]} | acc ]
+         {:static, route, path}, acc ->
+            [{route, :cowboy_static, {:file, path}} | acc ]
+         {:static_priv, app, route, path}, acc ->
+            [{route, :cowboy_static, {:priv_file, app, path}} | acc ]
+         {:static_priv_dir, app, route, path}, acc ->
+            [{route, :cowboy_static, {:priv_dir, app, path}} | acc ]
+          _, acc ->
+            # ignore othe config
+            acc
       end)
-
+    port = Keyword.get(opts, :port, 8080)
     dispatch = :cowboy_router.compile([
                 {:_, route_config}
                ])

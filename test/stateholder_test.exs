@@ -1,6 +1,6 @@
-defmodule CrossworldTest do
+defmodule StateHolderTest do
   use ExUnit.Case
-  doctest Crossworld
+  doctest StateHolder
 
   test "the truth" do
     assert 1 + 1 == 2

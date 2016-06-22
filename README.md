@@ -45,7 +45,7 @@ Install deps and run:
 	  use Application
 	  
 	  def start(_type, _args) do
-	    StateHolder.start_state_holder([{:websocket, "/", &EchoServer.Websocket.websocket_callback/1}])
+	    StateHolder.start_state_holder([{:websocket, "/", &EchoServer.Websocket.websocket_callback/1}], 8080)
 	    # (Start some supervisor here if you want)
 	  end
 	end

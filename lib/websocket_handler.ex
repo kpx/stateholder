@@ -5,7 +5,7 @@ defmodule StateHolder.WebsocketHandler do
   """
 
   def init(_, _req, _opts) do
-  	{:upgrade, :protocol, :cowboy_websocket}
+    {:upgrade, :protocol, :cowboy_websocket}
   end
 
   def websocket_init(_type, req, opts) do
@@ -15,9 +15,9 @@ defmodule StateHolder.WebsocketHandler do
   def websocket_handle({:text, text}, req, state) do
     callback = state[:websocket_callback]
     case Kernel.apply(callback, [text]) do
-		  :no_reply -> {:ok, req, state}
-		  {:reply, reply_msg} -> {:reply, {:text, reply_msg}, req, state}
-	 end
+      :no_reply -> {:ok, req, state}
+      {:reply, reply_msg} -> {:reply, {:text, reply_msg}, req, state}
+    end
   end
 
   def websocket_info({:broadcast, broadcast_msg }, req, state) do
@@ -25,12 +25,12 @@ defmodule StateHolder.WebsocketHandler do
     {:reply, {:text, broadcast_msg}, req, state}
   end
   def websocket_info(_data, req, state) do
-  	{:ok, req, state}
+    {:ok, req, state}
   end
 
   def websocket_terminate(_data, _req, _state) do
-  	#TODO: unregister user
-  	:ok
+    #TODO: unregister user
+    :ok
   end
 
   def broadcast(pids, msg), do: Enum.each(pids, fn(pid) -> send(pid, msg) end)

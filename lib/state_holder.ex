@@ -20,9 +20,7 @@ defmodule StateHolder do
             acc
       end)
     port = Keyword.get(opts, :port, 8080)
-    dispatch = :cowboy_router.compile([
-                {:_, route_config}
-               ])
+    dispatch = :cowboy_router.compile([{:_, route_config}])
     {:ok, _} = :cowboy.start_http(:http, 100,
                                   [port: port],
                                   [env: [dispatch: dispatch]])

@@ -76,18 +76,31 @@ defmodule StateHolder.Room do
   end
 
   @doc """
+  Broadcasts a text message `msg` to all members of the room 
+  """
+  def broadcast_text(room_name, msg) do
+    broadcast(room_name, :text, msg)
+  end
+
+  @doc """
+  Broadcasts a binary message `msg` to all members of the room 
+  """
+  def broadcast_binary(room_name, msg) do
+    broadcast(room_name, :binary, msg)
+  end
+
+  @doc """
   Broadcasts a message `msg` to all members of the room 
   """
-  def broadcast(room_name, msg) when is_binary(room_name) do
+  def broadcast(room_name, type, msg) when is_binary(room_name) do
     atom_name = String.to_existing_atom(room_name)
-    broadcast(atom_name, msg)
+    broadcast(atom_name, type, msg)
   end
-  def broadcast(room_name, msg) when is_atom(room_name) do
+  def broadcast(room_name, type, msg) when is_atom(room_name) do
     members = StateHolder.Room.get_members(room_name)
     #Tag the message as a broadcast (used by websocket handler)
-    broadcast_msg = {:broadcast, msg}
     pids = Enum.map(members, fn({_, pid}) -> pid end)
-    StateHolder.WebsocketHandler.broadcast(pids, broadcast_msg)
+    StateHolder.WebsocketHandler.broadcast(pids, type, msg)
   end
 
   @doc """

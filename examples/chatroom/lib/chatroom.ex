@@ -10,9 +10,10 @@ defmodule ChatRoom do
     StateHolder.start_state_holder([{:websocket, "/", &websocket_callback/1}, {:port, 8080}])
   end
 
-  def websocket_callback(msg) do
+  def websocket_callback({:text, msg}) do
     handle_msg(Poison.decode!(msg, as: %ChatMessage{}))
   end
+
   def handle_msg(%ChatMessage{action: "connect", room: room, user: user, msg: _msg}) do
     case StateHolder.Room.exists?(room) do
       true -> 
@@ -33,7 +34,7 @@ defmodule ChatRoom do
 
     #broadcast to all connected users
     broadcast_msg = Poison.encode!(%ChatMessage{user: user, msg: msg, timestamp: now})
-    StateHolder.Room.broadcast(room, broadcast_msg)
+    StateHolder.Room.broadcast_text(room, broadcast_msg)
     :no_reply
   end
 

@@ -12,19 +12,19 @@ defmodule StateHolder.WebsocketHandler do
     {:ok, req, opts}
   end
 
-  def websocket_handle({:text, text}, req, state) do
+  def websocket_handle({type, data} = msg , req, state) do
     callback = state[:websocket_callback]
-    case Kernel.apply(callback, [text]) do
+    case Kernel.apply(callback, [msg]) do
       :no_reply -> {:ok, req, state}
       {:reply, reply_msg} -> {:reply, {:text, reply_msg}, req, state}
     end
   end
 
-  def websocket_info({:broadcast, broadcast_msg }, req, state) do
+  def websocket_info({:broadcast, type, broadcast_msg}, req, state) do
     #Send a message to the client when a message tagged with :broadcast is received 
-    {:reply, {:text, broadcast_msg}, req, state}
+    {:reply, {type, broadcast_msg}, req, state}
   end
-  def websocket_info(_data, req, state) do
+    def websocket_info(_data, req, state) do
     {:ok, req, state}
   end
 
@@ -33,6 +33,6 @@ defmodule StateHolder.WebsocketHandler do
     :ok
   end
 
-  def broadcast(pids, msg), do: Enum.each(pids, fn(pid) -> send(pid, msg) end)
+  def broadcast(pids, type, msg), do: Enum.each(pids, fn(pid) -> send(pid, {:broadcast, type, msg}) end)
 
 end

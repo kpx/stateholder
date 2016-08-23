@@ -30,11 +30,11 @@ Install deps and run:
 
 ### Super simple echo websocket server
 
-  - Create an echo server and implement a websocket callback websocket_callback(String.t) :: {:reply, String.t} | :no_reply
+  - Create an echo server and implement a websocket callback websocket_callback(atom(), String.t) :: {:reply, String.t} | :no_reply
   
 	``` elixir	  
 	defmodule EchoServer.Websocket do
-	  def websocket_callback(websocket_msg) do
+	  def websocket_callback({:text, websocket_msg}) do
 	    {:reply, websocket_msg}
 	  end
 	end
